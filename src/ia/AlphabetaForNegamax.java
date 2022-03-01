@@ -9,6 +9,8 @@ public class AlphabetaForNegamax extends AlphabetaForMinimax
         super(player, deepness);
     }
 
+    //recherche du noeud le plus optimal en ne s'attardant pas sur les noeud ou alpha > beta. 
+    @Override
     public int browseNode(State state, int alpha, int beta, int deepness)
     {
         if (state.isOver() || deepness == 0)

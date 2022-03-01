@@ -1,7 +1,6 @@
 package game;
 
 import java.util.HashSet;
-import java.util.Random;
 import java.util.Set;
 
 public class State
@@ -13,6 +12,7 @@ public class State
 
     public State()
     {
+        //création de l'état initial : plateau, tour 1, joueur 1.
         this.board = new int[7][7];
         for(int i = 0 ; i <= 6 ; i++){for(int j = 0 ; j <= 6 ; j++){this.board[i][j] = 0;}}
         this.board[0][0] = 2;
@@ -23,15 +23,19 @@ public class State
         this.turn = 1;
         this.player = 1;
     }
+
     public State(State lastState, Move move)
     {
+        //Tour suivant 
         this.turn = lastState.getTurn() + 1;
 
+        //Changement du joueur actif
         if (lastState.getPlayer() == 1)
             this.player = 2;
         if (lastState.getPlayer() == 2)
             this.player = 1;
 
+        //récupération de l'ancien plateau et bouge les pions selon le mouvement.
         this.board = lastState.getBoard();
         if (move.isSkip())
         {
@@ -42,6 +46,7 @@ public class State
             this.board[move.getPosaX()][move.getPosaY()] = lastState.getPlayer();
             if (move.isClone() == false)
                this.board[move.getPosiX()][move.getPosiY()] = 0;
+            //Puis on infecte les pions autour du pions qui vient de bouger. 
             for (int a = -1 ; a <=1 ; a++)
             {
                 for (int b = -1 ; b <= 1 ; b++)
@@ -49,36 +54,18 @@ public class State
                     if (move.getPosaX()+a <= 6 && move.getPosaX()+a >= 0 && move.getPosaY()+b <= 6 && move.getPosaY()+b >=0)
                             if (this.board[move.getPosaX()+a][move.getPosaY()+b] == this.player)
                                 this.board[move.getPosaX()+a][move.getPosaY()+b] = lastState.getPlayer();
-                }      
+                }
             }
         }
     }
 
-    public int[][] getBoard()
+    //crée un nouveau state qui est considéré comme le suivant.
+    public State play(Move move)
     {
-        return this.board;
+        return new State(this, move);
     }
-    public int getTurn()
-    {
-        return this.turn;
-    }
-    public int getPlayer()
-    {
-        return this.player;
-    }
-    public boolean lastMoveIsSkip()
-    {
-        return this.lastMoveIsSkip;
-    }
-    /* private void setBoard(int[][] board)
-    {
-        this.board = board;
-    }
-    private void setPlayer(int player)
-    {
-        this.player = player;
-    } */
 
+    //renvoie la liste de tous les mouvement possible pour le joueur pris en argument.
     public Set<Move> getMove(int player)
     {
         HashSet<Move> allMoves = new HashSet<Move>();
@@ -108,100 +95,27 @@ public class State
                                 }
                             }
                         }
-                }  
-            }  
-        }   
-        return allMoves;                        
+                }
+            }
+        }
+        return allMoves;
     }
 
-    public int countPawn(int player)
-    {
-        int count = 0;
-        for (int i = 0 ; i <= 6 ; i++)
-            for (int j = 0 ; j <= 6 ; j++)
-                if (this.board[i][j] == player)
-                    count += 1;
-        return count;
-    }
-
-    public int getScore(int player)
-    {
-        if (this.player == 1)
-            return this.countPawn(1)/ (this.countPawn(1) + this.countPawn(2));
-        return this.countPawn(2) / (this.countPawn(2) + this.countPawn(1));
-    }
-
-    public State play(Move move)
-    {   
-        return new State(this, move);
-    }
-
+    // vérifie si le tableau ou si les deux joueurs passe leur tour en meme temps et renvoie un booleen indiquant si la partie est terminé 
     public boolean isOver()
     {
         if (this.countPawn(1) == 0 || this.countPawn(2) == 0)
         {
-            //System.out.println("Les deux joueurs ont tous les deux 0 pions, la partie est terminée");
             return true;
-        }  
+        }
         if (this.lastMoveIsSkip() && this.getMove(this.player).isEmpty())
         {
-            //System.out.println("Le joueur n°" + this.getPlayer() + " passe aussi son tour. La partie est terminée !");
             return true;
         }
-        /*
-        if (this.getPastBoards().size() != 0 || this.getPastBoards() != null)
-        {
-            for (int k = 0; k < this.getPastBoards().size(); k++)
-            {
-                int count = 0;
-                for(int i = 0 ; i <= 6 ; i++)
-                {
-                    for(int j = 0 ; j <= 6 ; j++)
-                    {
-                        if(this.getPastBoards().get(k)[i][j] == this.getBoard()[i][j])
-                            count += 1;
-                    }
-                }
-                if (count == 49)
-                {
-                    System.out.println(this.getPastBoards().toString());
-                    return false;
-                }
-
-                else
-                    count = 0;
-            }
-        }
-        */
         return false;
     }
 
-    public Move getRandomMove(int player)
-    {
-        if (this.getMove(player).isEmpty() == false)
-        {
-            Random randon = new Random();
-            int rdn = randon.nextInt(this.getMove(player).size()); //      choisi un int au hasard selon la taille du array
-                int i = 0;
-                for (Move move : this.getMove(player))
-                {
-                    if(i == rdn)
-                        return move;
-                    i++;
-                }
-        }
-        return new Move(7, 7, 7, 7, false, true);
-    }
-
-    /* public State clone()
-    {
-        State s = new State();
-        s.board = this.board.clone();
-        s.player = this.player;
-        s.turn = this.turn;
-        s.lastMoveIsSkip = false;
-        return s;
-    } */
+    //renvoie un cole du state actuel.
     public State getClone()
     {
         State cloneState = new State();
@@ -211,11 +125,55 @@ public class State
 				cloneState.board[i][j]=this.board[i][j];
 			}
 		}
-        
         cloneState.lastMoveIsSkip = false;
         cloneState.player = this.player;
         cloneState.turn = this.player;
 
         return cloneState;
+    }
+
+    //renvoie un int représentant le joueur victorieux ou 0 si match nul.
+    public int victory()
+    {
+        if (this.countPawn(1) == this.countPawn(2))
+            return 0;
+        else if (this.countPawn(1) > this.countPawn(2))
+            return 1;
+        return 2;
+    }
+
+    //Getter.
+    public int[][] getBoard()
+    {
+        return this.board;
+    }
+    public int getTurn()
+    {
+        return this.turn;
+    }
+    public int getPlayer()
+    {
+        return this.player;
+    }
+    public boolean lastMoveIsSkip()
+    {
+        return this.lastMoveIsSkip;
+    }
+    //calcul du nombre de pions du joueur en argument.
+    public int countPawn(int player)
+    {
+        int count = 0;
+        for (int i = 0 ; i <= 6 ; i++)
+            for (int j = 0 ; j <= 6 ; j++)
+                if (this.board[i][j] == player)
+                    count += 1;
+        return count;
+    }
+    //retourne le score du joueur pris en argument (ce score servira de donnée heuristique pour les algorithmes).
+    public int getScore(int player)
+    {
+        if (this.player == 1)
+            return this.countPawn(1)/ (this.countPawn(1) + this.countPawn(2));
+        return this.countPawn(2) / (this.countPawn(2) + this.countPawn(1));
     }
 }

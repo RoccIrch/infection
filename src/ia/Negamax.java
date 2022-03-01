@@ -9,6 +9,8 @@ public class Negamax extends Minimax
         super(player, deepness);
     }
 
+    //cherche dans tous les states possible le plus score le plus optimal et le retourne
+    @Override
     public int browseNode(State state, int deepness)
     {
         int res = Integer.MIN_VALUE;

@@ -18,6 +18,7 @@ public class Move
         this.isSkip = isSkip;
     }
 
+    //Getter.
     public int getPosaX ()
     {
         return this.posa_x;

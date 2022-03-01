@@ -12,6 +12,7 @@ public class AlphabetaForMinimax extends Algorithme
         super(player, deepness);
     }
 
+    //recherche du noeud le plus optimal en ne s'attardant pas sur les noeud ou alpha > beta. 
     public int browseNode(State state, int alpha, int beta, int deepness)
     {
         if (state.isOver() || deepness == 0)
@@ -49,6 +50,9 @@ public class AlphabetaForMinimax extends Algorithme
         return 0;
     }
 
+
+    //renvoie le mouvement ammenant à la valeur la plus avantageuse trouvé par alphabeta. 
+    @Override
     public Move getBestMove(State state)
     {
         Move bestMove = null;

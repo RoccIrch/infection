@@ -2,7 +2,7 @@ package ia;
 
 import game.*;
 
-public abstract class Algorithme 
+public abstract class Algorithme
 {
     protected int player;
     protected int deepness;
@@ -19,5 +19,5 @@ public abstract class Algorithme
         return this.countNode;
     }
 
-    public abstract Move getBestMove(State state);    
+    public abstract Move getBestMove(State state);
 }

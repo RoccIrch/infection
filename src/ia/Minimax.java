@@ -10,6 +10,7 @@ public class Minimax extends Algorithme
         super(player, deepness);
     }
 
+    //cherche dans tous les states possible le plus score le plus optimal et le retourne
     public int browseNode(State state, int deepness)
     {
         int res;
@@ -48,6 +49,8 @@ public class Minimax extends Algorithme
         return res;
     }
 
+    //retourne le mouvement permetant de prendre le moins de risque
+    @Override
     public Move getBestMove(State state)
     {
         Move bestMove = null;
